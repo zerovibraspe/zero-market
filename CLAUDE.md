@@ -22,7 +22,7 @@ Ver [`docs/Handoff Tienda de productos digitales — Landing + CMS.md`](docs/Han
 - **Storage de archivos:** Backblaze B2 (S3-compatible, capa gratuita sin tarjeta), vía `@aws-sdk/client-s3` — archivos maestros y personalizados nunca son públicos; se sirven a través de la ruta de descarga de la app, no desde B2 directo
 - **Watermarking de PDF:** `pdf-lib` (Node/TS) — NO usar Python, evita manejar dos runtimes en Vercel
 - **Video/plugin:** solo metadata (nombre + código de licencia), sin watermark visible quemado. Quemar un watermark visible en video requiere re-encodear con ffmpeg, lo cual puede exceder el límite de tiempo de las funciones serverless de Vercel
-- **Auth del CMS:** password simple + cookie de sesión firmada (un solo vendedor, no se necesita proveedor de auth externo)
+- **Auth del CMS:** usuario + password fijos (env vars `ADMIN_USERNAME`/`ADMIN_PASSWORD`) + cookie de sesión firmada (un solo vendedor, no se necesita proveedor de auth externo ni tabla de usuarios)
 
 ## Dos superficies de la app
 

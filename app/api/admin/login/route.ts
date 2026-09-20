@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { crearSesionAdmin } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
-  const { password } = await req.json();
+  const { usuario, password } = await req.json();
 
-  if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: "Contraseña incorrecta" }, { status: 401 });
+  const credencialesValidas =
+    !!process.env.ADMIN_USERNAME &&
+    !!process.env.ADMIN_PASSWORD &&
+    usuario === process.env.ADMIN_USERNAME &&
+    password === process.env.ADMIN_PASSWORD;
+
+  if (!credencialesValidas) {
+    return NextResponse.json({ error: "Usuario o contraseña incorrectos" }, { status: 401 });
   }
 
   const token = await crearSesionAdmin();

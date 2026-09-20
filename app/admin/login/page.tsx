@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
@@ -17,7 +18,7 @@ export default function AdminLoginPage() {
     const res = await fetch("/api/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ usuario, password }),
     });
 
     setCargando(false);
@@ -36,6 +37,22 @@ export default function AdminLoginPage() {
     <div className="flex-1 flex items-center justify-center px-6">
       <form onSubmit={onSubmit} className="w-full max-w-sm bg-surface border border-border rounded-2xl p-8 flex flex-col gap-4">
         <h1 className="font-display font-bold text-xl">Acceso al panel</h1>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="usuario" className="text-sm font-medium text-muted">
+            Usuario
+          </label>
+          <input
+            id="usuario"
+            type="text"
+            autoComplete="username"
+            value={usuario}
+            onChange={(e) => setUsuario(e.target.value)}
+            required
+            className="w-full rounded-xl border border-border px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-dark"
+          />
+        </div>
+
         <div className="flex flex-col gap-1.5">
           <label htmlFor="password" className="text-sm font-medium text-muted">
             Contraseña
@@ -43,13 +60,16 @@ export default function AdminLoginPage() {
           <input
             id="password"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             className="w-full rounded-xl border border-border px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-accent-dark"
           />
         </div>
+
         {error && <p className="text-sm text-error-fg bg-error-bg rounded-lg px-3 py-2">{error}</p>}
+
         <button
           type="submit"
           disabled={cargando}
