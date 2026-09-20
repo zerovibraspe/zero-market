@@ -99,7 +99,7 @@ export function FormularioEditarProducto({
         <input name="autorNombre" defaultValue={producto.autorNombre ?? ""} placeholder="Se imprime en la marca de agua" className="input" />
       </Campo>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Campo label="Categoría">
           <input name="categoria" list="categorias-existentes" defaultValue={producto.categoria} required className="input" />
           <datalist id="categorias-existentes">

@@ -85,7 +85,7 @@ export function FormularioTicket({ productos }: { productos: Producto[] }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="bg-surface border border-border rounded-2xl p-8 flex flex-col gap-5 max-w-[560px]">
+    <form onSubmit={onSubmit} className="bg-surface border border-border rounded-2xl p-5 sm:p-8 flex flex-col gap-5 max-w-[560px]">
       <label className="flex flex-col gap-1.5 text-sm">
         <span className="font-medium text-muted">Producto</span>
         <select value={productoId} onChange={(e) => setProductoId(e.target.value)} className="input">

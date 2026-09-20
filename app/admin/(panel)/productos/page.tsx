@@ -12,9 +12,11 @@ export default async function AdminProductosPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <h1 className="font-display font-bold text-2xl">Productos</h1>
-        <FormularioProducto categoriasExistentes={[...new Set(lista.map((p) => p.categoria))]} />
+        <div className="self-start sm:self-auto">
+          <FormularioProducto categoriasExistentes={[...new Set(lista.map((p) => p.categoria))]} />
+        </div>
       </div>
 
       {lista.length === 0 ? (

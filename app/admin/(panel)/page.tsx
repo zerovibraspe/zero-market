@@ -35,14 +35,17 @@ export default async function AdminTicketsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-8">
         <h1 className="font-display font-bold text-2xl">Tickets</h1>
-        <Link href="/admin/tickets/nuevo" className="px-5 py-2.5 rounded-full bg-accent text-ink text-sm font-semibold">
+        <Link
+          href="/admin/tickets/nuevo"
+          className="self-start sm:self-auto px-5 py-2.5 rounded-full bg-accent text-ink text-sm font-semibold"
+        >
           + Generar ticket
         </Link>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
           { label: "Tickets generados", valor: generados },
           { label: "Descargados", valor: descargados },
@@ -55,8 +58,8 @@ export default async function AdminTicketsPage() {
         ))}
       </div>
 
-      <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="bg-surface border border-border rounded-2xl overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="text-left text-muted border-b border-border">
               <th className="px-5 py-3 font-medium">Comprador</th>
