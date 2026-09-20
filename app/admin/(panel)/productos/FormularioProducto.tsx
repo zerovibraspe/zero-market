@@ -88,6 +88,13 @@ export function FormularioProducto({ categoriasExistentes }: { categoriasExisten
         <input name="autorNombre" placeholder="Se imprime en la marca de agua" className="input" />
       </Campo>
 
+      <Campo label="WhatsApp de venta (opcional)">
+        <input name="whatsappNumero" type="tel" placeholder="51999999999" className="input" />
+        <span className="text-xs text-muted">
+          Formato internacional sin +. Si lo dejas vacío, usa el número general de la tienda.
+        </span>
+      </Campo>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Campo label="Categoría">
           <input name="categoria" list="categorias-existentes" required placeholder="pdf, video, curso..." className="input" />

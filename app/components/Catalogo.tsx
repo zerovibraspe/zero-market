@@ -12,6 +12,7 @@ type Producto = {
   precio: string;
   portadaUrl: string | null;
   fotos: string[];
+  whatsappNumero: string | null;
 };
 
 export function Catalogo({ productos, whatsappNumero }: { productos: Producto[]; whatsappNumero: string }) {
@@ -49,7 +50,7 @@ export function Catalogo({ productos, whatsappNumero }: { productos: Producto[];
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {visibles.map((producto) => (
             <div key={producto.id} className="bg-surface border border-border rounded-2xl overflow-hidden flex flex-col">
-              <Link href={`/productos/${producto.id}`} className="aspect-[4/3] bg-surface-alt flex items-center justify-center">
+              <Link href={`/productos/${producto.id}`} className="h-[228px] bg-surface-alt flex items-center justify-center overflow-hidden">
                 {producto.fotos[0] || producto.portadaUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={producto.fotos[0] ?? producto.portadaUrl!} alt={producto.nombre} className="w-full h-full object-cover" />
@@ -68,7 +69,7 @@ export function Catalogo({ productos, whatsappNumero }: { productos: Producto[];
                 <div className="mt-auto flex items-center justify-between pt-2">
                   <span className="font-display font-bold text-lg">{formatearPrecio(producto.precio)}</span>
                   <a
-                    href={linkWhatsapp(whatsappNumero, producto.nombre)}
+                    href={linkWhatsapp(producto.whatsappNumero || whatsappNumero, producto.nombre)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 rounded-full bg-accent text-ink text-sm font-semibold hover:brightness-95 transition"

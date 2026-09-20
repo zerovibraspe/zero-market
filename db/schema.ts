@@ -24,6 +24,8 @@ export const productos = pgTable("productos", {
   // Link de YouTube o ruta dentro de /public (video subido al CMS y commiteado a GitHub,
   // igual que las fotos) — se distingue por el formato del string, ver lib/video.ts.
   videoMuestraUrl: text("video_muestra_url"),
+  // Si está vacío, el botón "Comprar" cae al NEXT_PUBLIC_WHATSAPP_NUMBER general de la tienda.
+  whatsappNumero: text("whatsapp_numero"),
   archivoMaestroUrl: text("archivo_maestro_url").notNull(),
   precio: numeric("precio", { precision: 10, scale: 2 }).notNull(),
   requiereWatermark: boolean("requiere_watermark").notNull().default(true),

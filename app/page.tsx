@@ -20,7 +20,11 @@ export default async function Home() {
     <div className="flex flex-col flex-1">
       <header className="sticky top-4 z-10 mx-4 sm:mx-8">
         <nav className="max-w-5xl mx-auto flex items-center justify-between bg-surface border border-border rounded-full h-16 px-6 shadow-sm">
-          <span className="font-display font-bold text-lg">{NOMBRE_TIENDA}</span>
+          <span className="flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/zeromarket.webp" alt="" className="h-9 w-9 rounded-lg object-contain" />
+            <span className="font-display font-bold text-lg">{NOMBRE_TIENDA}</span>
+          </span>
           <div className="hidden sm:flex items-center gap-6 text-sm text-muted">
             <a href="#catalogo" className="hover:text-ink">Catálogo</a>
             <a href="#como-funciona" className="hover:text-ink">Cómo funciona</a>

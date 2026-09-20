@@ -17,6 +17,7 @@ type Producto = {
   activo: boolean;
   fotos: string[];
   videoMuestraUrl: string | null;
+  whatsappNumero: string | null;
   archivoMaestroUrl: string;
 };
 
@@ -97,6 +98,13 @@ export function FormularioEditarProducto({
 
       <Campo label="Autor / creador">
         <input name="autorNombre" defaultValue={producto.autorNombre ?? ""} placeholder="Se imprime en la marca de agua" className="input" />
+      </Campo>
+
+      <Campo label="WhatsApp de venta (opcional)">
+        <input name="whatsappNumero" type="tel" defaultValue={producto.whatsappNumero ?? ""} placeholder="51999999999" className="input" />
+        <span className="text-xs text-muted">
+          Formato internacional sin +. Si lo dejas vacío, usa el número general de la tienda.
+        </span>
       </Campo>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

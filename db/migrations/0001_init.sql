@@ -14,6 +14,8 @@ create table productos (
   fotos jsonb not null default '[]'::jsonb,
   -- Link de YouTube o ruta dentro de /public (video subido al CMS, commiteado a GitHub igual que las fotos).
   video_muestra_url text,
+  -- Si está vacío, el botón "Comprar" cae al NEXT_PUBLIC_WHATSAPP_NUMBER general de la tienda.
+  whatsapp_numero text,
   archivo_maestro_url text not null,
   precio numeric(10, 2) not null,
   requiere_watermark boolean not null default true,

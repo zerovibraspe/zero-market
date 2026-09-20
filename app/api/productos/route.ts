@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       nombre,
       descripcion: String(formData.get("descripcion") ?? "") || null,
       autorNombre: String(formData.get("autorNombre") ?? "") || null,
+      whatsappNumero: String(formData.get("whatsappNumero") ?? "").replace(/\D/g, "") || null,
       categoria,
       fotos,
       videoMuestraUrl,

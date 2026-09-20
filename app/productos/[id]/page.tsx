@@ -63,7 +63,7 @@ export default async function ProductoDetallePage({ params }: { params: Promise<
             <div className="flex items-center justify-between border-t border-border pt-6">
               <span className="font-display font-bold text-2xl">{formatearPrecio(producto.precio)}</span>
               <a
-                href={linkWhatsapp(WHATSAPP_NUMERO, producto.nombre)}
+                href={linkWhatsapp(producto.whatsappNumero || WHATSAPP_NUMERO, producto.nombre)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3 rounded-full bg-accent text-ink font-semibold"

@@ -58,6 +58,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       nombre,
       descripcion: String(formData.get("descripcion") ?? "") || null,
       autorNombre: String(formData.get("autorNombre") ?? "") || null,
+      whatsappNumero: String(formData.get("whatsappNumero") ?? "").replace(/\D/g, "") || null,
       categoria,
       fotos,
       videoMuestraUrl,
