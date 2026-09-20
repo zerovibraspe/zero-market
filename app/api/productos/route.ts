@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
 import { productos } from "@/db/schema";
-import { subirArchivo } from "@/lib/b2";
 import { subirFotosProducto, subirVideoProducto } from "@/lib/github";
 import { slugify } from "@/lib/slug";
 
 // Protegido por proxy.ts (matcher incluye /api/productos/:path*) — solo el admin autenticado llega aquí.
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
-  const archivo = formData.get("archivoMaestro");
 
-  if (!(archivo instanceof File)) {
+  // El archivo maestro ya se subió directo a B2 desde el navegador (ver /api/productos/upload-url)
+  // para evitar el límite de 4.5 MB del body de las funciones serverless de Vercel.
+  const archivoMaestroUrl = String(formData.get("archivoMaestroKey") ?? "");
+
+  if (!archivoMaestroUrl) {
     return NextResponse.json({ error: "Falta el archivo maestro" }, { status: 400 });
   }
 
@@ -22,10 +24,6 @@ export async function POST(req: NextRequest) {
   if (!nombre || !categoria || !precio) {
     return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
   }
-
-  const bytes = Buffer.from(await archivo.arrayBuffer());
-  const key = `productos/${nanoid()}-${archivo.name}`;
-  await subirArchivo(key, bytes, archivo.type || "application/octet-stream");
 
   // Fotos y video de muestra se guardan en el repo de GitHub (no en B2), estáticos y sin costo de storage.
   const carpeta = `${slugify(nombre)}-${nanoid(6)}`;
@@ -50,7 +48,7 @@ export async function POST(req: NextRequest) {
       categoria,
       fotos,
       videoMuestraUrl,
-      archivoMaestroUrl: key,
+      archivoMaestroUrl,
       precio,
       requiereWatermark: formData.get("requiereWatermark") === "true",
       activo: true,

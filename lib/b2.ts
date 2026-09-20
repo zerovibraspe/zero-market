@@ -48,3 +48,10 @@ export async function urlDescargaFirmada(key: string, expiresInSeconds = 120) {
   const command = new GetObjectCommand({ Bucket: BUCKET, Key: key });
   return getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
 }
+
+// Para que el navegador suba el archivo maestro directo a B2 (sin pasar por una función de
+// Vercel, que limita el body a 4.5 MB) — el cliente hace PUT directo a esta URL.
+export async function urlSubidaFirmada(key: string, contentType: string, expiresInSeconds = 300) {
+  const command = new PutObjectCommand({ Bucket: BUCKET, Key: key, ContentType: contentType });
+  return getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
+}

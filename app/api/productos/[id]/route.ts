@@ -3,7 +3,6 @@ import { nanoid } from "nanoid";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { productos } from "@/db/schema";
-import { subirArchivo } from "@/lib/b2";
 import { subirFotosProducto, subirVideoProducto } from "@/lib/github";
 import { slugify, carpetaDesdeRuta } from "@/lib/slug";
 
@@ -26,14 +25,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
   }
 
-  // Reemplazo opcional del archivo maestro.
-  let archivoMaestroUrl = existente.archivoMaestroUrl;
-  const nuevoArchivo = formData.get("archivoMaestro");
-  if (nuevoArchivo instanceof File && nuevoArchivo.size > 0) {
-    const bytes = Buffer.from(await nuevoArchivo.arrayBuffer());
-    archivoMaestroUrl = `productos/${nanoid()}-${nuevoArchivo.name}`;
-    await subirArchivo(archivoMaestroUrl, bytes, nuevoArchivo.type || "application/octet-stream");
-  }
+  // Reemplazo opcional del archivo maestro — ya subido directo a B2 desde el navegador
+  // (ver /api/productos/upload-url), evita el límite de 4.5 MB del body en Vercel.
+  const archivoMaestroKey = String(formData.get("archivoMaestroKey") ?? "");
+  const archivoMaestroUrl = archivoMaestroKey || existente.archivoMaestroUrl;
 
   // Reusa la carpeta de GitHub existente (de una foto o video previos) para no dispersar archivos del mismo producto.
   const carpeta =

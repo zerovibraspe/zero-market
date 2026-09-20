@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { CATEGORIAS_SUGERIDAS } from "@/lib/productos";
 import { esVideoYoutube } from "@/lib/video";
+import { subirArchivoMaestro, validarTamanoTotal } from "@/lib/subida-cliente";
 
 type Producto = {
   id: string;
@@ -46,6 +47,30 @@ export function FormularioEditarProducto({
     formData.set("activo", formData.get("activo") === "on" ? "true" : "false");
     formData.set("quitarVideo", quitarVideo ? "true" : "false");
     fotosConservadas.forEach((ruta) => formData.append("fotosConservadas", ruta));
+
+    const archivosParaGithub = [
+      ...formData.getAll("fotosNuevas").filter((f): f is File => f instanceof File && f.size > 0),
+      ...formData.getAll("videoArchivo").filter((f): f is File => f instanceof File && f.size > 0),
+    ];
+    const errorTamano = validarTamanoTotal(archivosParaGithub);
+    if (errorTamano) {
+      setCargando(false);
+      setError(errorTamano);
+      return;
+    }
+
+    const nuevoArchivoMaestro = formData.get("archivoMaestro");
+    formData.delete("archivoMaestro");
+
+    if (nuevoArchivoMaestro instanceof File && nuevoArchivoMaestro.size > 0) {
+      try {
+        formData.set("archivoMaestroKey", await subirArchivoMaestro(nuevoArchivoMaestro));
+      } catch {
+        setCargando(false);
+        setError("No se pudo subir el nuevo archivo maestro. Intenta de nuevo.");
+        return;
+      }
+    }
 
     const res = await fetch(`/api/productos/${producto.id}`, { method: "PATCH", body: formData });
     setCargando(false);
