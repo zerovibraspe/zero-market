@@ -26,12 +26,15 @@ Si cambias `db/schema.ts`, aplica el cambio a Neon con:
 npm run db:push
 ```
 
-## Fotos de producto
+## Fotos y video de producto
 
-Se suben directo desde `/admin/productos` (campo "Fotos", selector de archivos normal) — el vendedor
-no necesita saber qué es GitHub. Por debajo, `lib/github.ts` las sube vía la API de contenidos de
-GitHub a `public/productos/<slug>/` en este mismo repo (no a B2), lo que dispara un redeploy
-automático en Vercel; la foto tarda ~1 minuto en verse reflejada mientras termina ese deploy.
+Se suben directo desde `/admin/productos` (o al editar un producto), con selectores de archivo
+normales — el vendedor no necesita saber qué es GitHub. Por debajo, `lib/github.ts` los sube vía la
+API de contenidos de GitHub a `public/productos/<slug>/` en este mismo repo (no a B2), lo que dispara
+un redeploy automático en Vercel; tardan ~1 minuto en verse reflejados mientras termina ese deploy.
+
+El video de muestra admite dos formas: pegar un link de YouTube, o subir un archivo de video
+directamente (mismo mecanismo que las fotos). Si mandas ambos, se prioriza el archivo subido.
 
 Esto es intencional: B2 guarda solo los archivos entregables protegidos (que nunca son públicos),
 mientras que las fotos de marketing son estáticas y viajan con cada deploy de Vercel vía GitHub — así
@@ -49,20 +52,22 @@ Requiere un Personal Access Token de GitHub (`GITHUB_TOKEN` en `.env.local`/Verc
 ```
 app/
   page.tsx                       → landing con catálogo de productos (filtro real por categoría)
-  productos/[id]/page.tsx        → página de detalle del producto (galería, descripción, CTA)
+  productos/[id]/page.tsx        → página de detalle del producto (header, galería, video, CTA)
   descargar/[codigo]/page.tsx    → página de descarga del comprador
   admin/
-    login/page.tsx               → login del CMS
+    login/page.tsx               → login del CMS (usuario + password)
     (panel)/page.tsx             → CMS: lista de tickets + stats
     (panel)/productos/page.tsx   → CMS: lista y alta de productos
-    (panel)/tickets/nuevo/page.tsx → CMS: generar ticket
+    (panel)/productos/[id]/editar/page.tsx → CMS: editar producto (fotos, video, archivo maestro, etc.)
+    (panel)/tickets/nuevo/page.tsx → CMS: generar ticket + botón de envío por WhatsApp
   api/
     admin/login|logout/route.ts
-    productos/route.ts           → alta de producto (sube archivo maestro a B2)
+    productos/route.ts           → alta de producto (sube archivo maestro a B2, fotos/video a GitHub)
+    productos/[id]/route.ts      → edición de producto (PATCH)
     tickets/route.ts             → genera ticket + archivo personalizado
     descargar/[codigo]/route.ts  → valida, sirve el archivo desde B2, marca como descargado
 lib/
-  db.ts, b2.ts, auth.ts, watermark.ts, codigos.ts, tickets.ts, productos.ts
+  db.ts, b2.ts, auth.ts, watermark.ts, codigos.ts, tickets.ts, productos.ts, github.ts, slug.ts, video.ts
 db/
   schema.ts, migrations/
 public/productos/                → fotos de producto (ver sección arriba)

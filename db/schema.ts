@@ -21,6 +21,9 @@ export const productos = pgTable("productos", {
   // Rutas dentro de /public (ej. "/productos/mi-producto/1.jpg"), servidas desde el propio
   // repo de GitHub/Vercel — a propósito no viven en B2, ver README "Fotos de producto".
   fotos: jsonb("fotos").$type<string[]>().notNull().default([]),
+  // Link de YouTube o ruta dentro de /public (video subido al CMS y commiteado a GitHub,
+  // igual que las fotos) — se distingue por el formato del string, ver lib/video.ts.
+  videoMuestraUrl: text("video_muestra_url"),
   archivoMaestroUrl: text("archivo_maestro_url").notNull(),
   precio: numeric("precio", { precision: 10, scale: 2 }).notNull(),
   requiereWatermark: boolean("requiere_watermark").notNull().default(true),

@@ -1,3 +1,6 @@
+import { nanoid } from "nanoid";
+import { slugify } from "./slug";
+
 const GITHUB_API = "https://api.github.com";
 
 function config() {
@@ -31,4 +34,36 @@ export async function subirArchivoAGithub(params: { ruta: string; contenido: Buf
     const detalle = await res.text();
     throw new Error(`GitHub API error (${res.status}): ${detalle}`);
   }
+}
+
+function nombreUnico(archivo: File) {
+  const extension = archivo.name.match(/\.[^.]+$/)?.[0] ?? "";
+  const base = slugify(archivo.name.replace(/\.[^.]+$/, ""));
+  return `${nanoid(6)}-${base}${extension}`;
+}
+
+// Sube varias fotos a public/productos/<carpeta>/ y devuelve sus rutas públicas (/productos/<carpeta>/archivo).
+export async function subirFotosProducto(params: { carpeta: string; nombreProducto: string; archivos: File[] }) {
+  const rutas: string[] = [];
+  for (const archivo of params.archivos) {
+    const nombreArchivo = nombreUnico(archivo);
+    await subirArchivoAGithub({
+      ruta: `public/productos/${params.carpeta}/${nombreArchivo}`,
+      contenido: Buffer.from(await archivo.arrayBuffer()),
+      mensaje: `Foto de producto: ${params.nombreProducto}`,
+    });
+    rutas.push(`/productos/${params.carpeta}/${nombreArchivo}`);
+  }
+  return rutas;
+}
+
+// Sube un video de muestra a public/productos/<carpeta>/video/ y devuelve su ruta pública.
+export async function subirVideoProducto(params: { carpeta: string; nombreProducto: string; archivo: File }) {
+  const nombreArchivo = nombreUnico(params.archivo);
+  await subirArchivoAGithub({
+    ruta: `public/productos/${params.carpeta}/video/${nombreArchivo}`,
+    contenido: Buffer.from(await params.archivo.arrayBuffer()),
+    mensaje: `Video de muestra: ${params.nombreProducto}`,
+  });
+  return `/productos/${params.carpeta}/video/${nombreArchivo}`;
 }

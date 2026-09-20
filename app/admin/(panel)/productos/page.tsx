@@ -31,9 +31,14 @@ export default async function AdminProductosPage() {
               <p className="text-xs text-muted mb-2">
                 {p.activo ? "Visible en catálogo" : "Oculto"} · {p.fotos.length} foto{p.fotos.length === 1 ? "" : "s"}
               </p>
-              <Link href={`/productos/${p.id}`} target="_blank" className="text-xs text-accent-dark font-semibold underline">
-                Ver página →
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link href={`/productos/${p.id}`} target="_blank" className="text-xs text-accent-dark font-semibold underline">
+                  Ver página →
+                </Link>
+                <Link href={`/admin/productos/${p.id}/editar`} className="text-xs text-muted font-semibold underline">
+                  Editar
+                </Link>
+              </div>
             </div>
           ))}
         </div>

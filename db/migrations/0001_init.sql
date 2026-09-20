@@ -12,6 +12,8 @@ create table productos (
   portada_url text,
   -- Rutas dentro de /public (ej. "/productos/mi-producto/1.jpg"), servidas desde el repo — no viven en B2.
   fotos jsonb not null default '[]'::jsonb,
+  -- Link de YouTube o ruta dentro de /public (video subido al CMS, commiteado a GitHub igual que las fotos).
+  video_muestra_url text,
   archivo_maestro_url text not null,
   precio numeric(10, 2) not null,
   requiere_watermark boolean not null default true,
