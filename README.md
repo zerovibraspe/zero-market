@@ -28,13 +28,21 @@ npm run db:push
 
 ## Fotos de producto
 
-Las fotos de cada producto (para su página de detalle `/productos/[id]` y su tarjeta en el catálogo) se suben como archivos normales del repo, no vía el CMS a B2:
+Se suben directo desde `/admin/productos` (campo "Fotos", selector de archivos normal) — el vendedor
+no necesita saber qué es GitHub. Por debajo, `lib/github.ts` las sube vía la API de contenidos de
+GitHub a `public/productos/<slug>/` en este mismo repo (no a B2), lo que dispara un redeploy
+automático en Vercel; la foto tarda ~1 minuto en verse reflejada mientras termina ese deploy.
 
-1. Crea una carpeta por producto en `public/productos/`, ej. `public/productos/plantillas-notion/1.jpg`.
-2. Haz commit y push de las imágenes.
-3. En `/admin/productos`, al crear el producto, pega esas rutas en el campo "Fotos" separadas por coma (ej. `/productos/plantillas-notion/1.jpg, /productos/plantillas-notion/2.jpg`).
+Esto es intencional: B2 guarda solo los archivos entregables protegidos (que nunca son públicos),
+mientras que las fotos de marketing son estáticas y viajan con cada deploy de Vercel vía GitHub — así
+no pagas storage de imágenes en B2 ni expones el bucket.
 
-Esto es intencional: B2 guarda solo los archivos entregables protegidos (que nunca son públicos), mientras que las fotos de marketing son estáticas y viajan con cada deploy de Vercel vía GitHub.
+Requiere un Personal Access Token de GitHub (`GITHUB_TOKEN` en `.env.local`/Vercel):
+
+1. [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
+2. Tipo **Fine-grained**, "Only select repositories" → `zerovibraspe/zero-market`
+3. Permiso **Contents: Read and write** (nada más)
+4. Copia el token a `GITHUB_TOKEN`
 
 ## Estructura del proyecto
 

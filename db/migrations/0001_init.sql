@@ -7,7 +7,8 @@ create table productos (
   nombre text not null,
   descripcion text,
   autor_nombre text,
-  categoria text not null check (categoria in ('pdf', 'video', 'plugin', 'otro')),
+  -- Texto libre: el vendedor crea las categorías que quiera desde el CMS, sin enum fijo.
+  categoria text not null,
   portada_url text,
   -- Rutas dentro de /public (ej. "/productos/mi-producto/1.jpg"), servidas desde el repo — no viven en B2.
   fotos jsonb not null default '[]'::jsonb,

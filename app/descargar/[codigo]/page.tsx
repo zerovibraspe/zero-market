@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { tickets, productos } from "@/db/schema";
 import { ticketVigente } from "@/lib/tickets";
-import { CATEGORIA_LABEL } from "@/lib/productos";
+import { categoriaLabel } from "@/lib/productos";
 import { IconoCategoria } from "@/app/components/IconoCategoria";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,7 @@ export default async function DescargaPage({ params }: { params: Promise<{ codig
       codigoLicencia: tickets.codigoLicencia,
       productoNombre: productos.nombre,
       productoCategoria: productos.categoria,
-      portadaUrl: productos.portadaUrl,
+      fotos: productos.fotos,
     })
     .from(tickets)
     .innerJoin(productos, eq(tickets.productoId, productos.id))
@@ -38,16 +38,16 @@ export default async function DescargaPage({ params }: { params: Promise<{ codig
       </header>
 
       <div className="bg-surface-alt rounded-2xl aspect-[4/3] flex items-center justify-center mb-6">
-        {ticket.portadaUrl ? (
+        {ticket.fotos[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={ticket.portadaUrl} alt={ticket.productoNombre} className="w-full h-full object-cover rounded-2xl" />
+          <img src={ticket.fotos[0]} alt={ticket.productoNombre} className="w-full h-full object-cover rounded-2xl" />
         ) : (
           <IconoCategoria categoria={ticket.productoCategoria} className="w-12 h-12 text-accent-dark" />
         )}
       </div>
 
       <span className="inline-flex self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-accent-tint text-accent-dark mb-2">
-        {CATEGORIA_LABEL[ticket.productoCategoria]}
+        {categoriaLabel(ticket.productoCategoria)}
       </span>
       <h1 className="font-display font-bold text-xl mb-1 break-words">{ticket.productoNombre}</h1>
       <p className="text-muted text-sm mb-6 line-clamp-2">Hola, {ticket.nombreComprador}</p>

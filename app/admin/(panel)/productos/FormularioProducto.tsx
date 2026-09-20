@@ -2,13 +2,15 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { CATEGORIAS_SUGERIDAS } from "@/lib/productos";
 
-export function FormularioProducto() {
+export function FormularioProducto({ categoriasExistentes }: { categoriasExistentes: string[] }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
-  const [categoria, setCategoria] = useState("pdf");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+
+  const categorias = [...new Set([...CATEGORIAS_SUGERIDAS, ...categoriasExistentes])];
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -16,7 +18,7 @@ export function FormularioProducto() {
     setCargando(true);
 
     const formData = new FormData(e.currentTarget);
-    formData.set("requiereWatermark", categoria === "pdf" ? "true" : "false");
+    formData.set("requiereWatermark", formData.get("requiereWatermark") === "on" ? "true" : "false");
 
     const res = await fetch("/api/productos", { method: "POST", body: formData });
     setCargando(false);
@@ -62,27 +64,28 @@ export function FormularioProducto() {
 
       <div className="grid grid-cols-2 gap-4">
         <Campo label="Categoría">
-          <select name="categoria" value={categoria} onChange={(e) => setCategoria(e.target.value)} className="input">
-            <option value="pdf">PDF</option>
-            <option value="video">Video</option>
-            <option value="plugin">Plugin</option>
-            <option value="otro">Otro</option>
-          </select>
+          <input name="categoria" list="categorias-existentes" required placeholder="pdf, video, curso..." className="input" />
+          <datalist id="categorias-existentes">
+            {categorias.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
+          <span className="text-xs text-muted">Elige una existente o escribe una nueva.</span>
         </Campo>
         <Campo label="Precio (S/)">
           <input name="precio" type="number" step="0.01" min="0" required className="input" />
         </Campo>
       </div>
 
-      <Campo label="Fotos">
-        <input
-          name="fotos"
-          placeholder="/productos/mi-producto/1.jpg, /productos/mi-producto/2.jpg"
-          className="input"
-        />
+      <label className="flex items-center gap-2 text-sm">
+        <input name="requiereWatermark" type="checkbox" defaultChecked className="h-4 w-4" />
+        <span className="font-medium text-muted">Aplicar marca de agua (solo tiene efecto en archivos PDF)</span>
+      </label>
+
+      <Campo label="Fotos (opcional, puedes elegir varias)">
+        <input name="fotos" type="file" accept="image/*" multiple className="input" />
         <span className="text-xs text-muted">
-          Rutas separadas por coma. Sube las imágenes a <code>public/productos/</code> en el repo de GitHub antes de
-          crear el producto — no se suben a B2.
+          Tardan ~1 minuto en verse reflejadas en la página mientras Vercel vuelve a desplegar.
         </span>
       </Campo>
 

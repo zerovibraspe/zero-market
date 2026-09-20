@@ -3,6 +3,8 @@ import { nanoid } from "nanoid";
 import { db } from "@/lib/db";
 import { productos } from "@/db/schema";
 import { subirArchivo } from "@/lib/b2";
+import { subirArchivoAGithub } from "@/lib/github";
+import { slugify } from "@/lib/slug";
 
 // Protegido por proxy.ts (matcher incluye /api/productos/:path*) — solo el admin autenticado llega aquí.
 export async function POST(req: NextRequest) {
@@ -14,10 +16,10 @@ export async function POST(req: NextRequest) {
   }
 
   const nombre = String(formData.get("nombre") ?? "").trim();
-  const categoria = String(formData.get("categoria") ?? "");
+  const categoria = String(formData.get("categoria") ?? "").trim();
   const precio = String(formData.get("precio") ?? "");
 
-  if (!nombre || !["pdf", "video", "plugin", "otro"].includes(categoria) || !precio) {
+  if (!nombre || !categoria || !precio) {
     return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
   }
 
@@ -25,10 +27,22 @@ export async function POST(req: NextRequest) {
   const key = `productos/${nanoid()}-${archivo.name}`;
   await subirArchivo(key, bytes, archivo.type || "application/octet-stream");
 
-  const fotos = String(formData.get("fotos") ?? "")
-    .split(",")
-    .map((ruta) => ruta.trim())
-    .filter(Boolean);
+  // Fotos: se guardan en el repo de GitHub (no en B2) para que sean estáticas y públicas sin costo de storage.
+  const carpeta = `${slugify(nombre)}-${nanoid(6)}`;
+  const archivosFoto = formData.getAll("fotos").filter((f): f is File => f instanceof File && f.size > 0);
+
+  const fotos: string[] = [];
+  for (const foto of archivosFoto) {
+    const nombreArchivo = `${nanoid(6)}-${slugify(foto.name.replace(/\.[^.]+$/, ""))}${foto.name.match(/\.[^.]+$/)?.[0] ?? ""}`;
+    const rutaRepo = `public/productos/${carpeta}/${nombreArchivo}`;
+    const bytesFoto = Buffer.from(await foto.arrayBuffer());
+    await subirArchivoAGithub({
+      ruta: rutaRepo,
+      contenido: bytesFoto,
+      mensaje: `Foto de producto: ${nombre}`,
+    });
+    fotos.push(`/productos/${carpeta}/${nombreArchivo}`);
+  }
 
   const [producto] = await db
     .insert(productos)
@@ -36,7 +50,7 @@ export async function POST(req: NextRequest) {
       nombre,
       descripcion: String(formData.get("descripcion") ?? "") || null,
       autorNombre: String(formData.get("autorNombre") ?? "") || null,
-      categoria: categoria as "pdf" | "video" | "plugin" | "otro",
+      categoria,
       fotos,
       archivoMaestroUrl: key,
       precio,

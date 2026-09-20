@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { IconoCategoria } from "./IconoCategoria";
-import { CATEGORIA_LABEL, formatearPrecio, linkWhatsapp } from "@/lib/productos";
+import { categoriaLabel, formatearPrecio, linkWhatsapp } from "@/lib/productos";
 
 type Producto = {
   id: string;
@@ -14,17 +14,16 @@ type Producto = {
   fotos: string[];
 };
 
-const FILTROS = ["todos", "pdf", "video", "plugin"] as const;
-
 export function Catalogo({ productos, whatsappNumero }: { productos: Producto[]; whatsappNumero: string }) {
-  const [filtro, setFiltro] = useState<(typeof FILTROS)[number]>("todos");
+  const [filtro, setFiltro] = useState<string>("todos");
 
+  const filtros = useMemo(() => ["todos", ...new Set(productos.map((p) => p.categoria))], [productos]);
   const visibles = filtro === "todos" ? productos : productos.filter((p) => p.categoria === filtro);
 
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-8">
-        {FILTROS.map((f) => (
+        {filtros.map((f) => (
           <button
             key={f}
             onClick={() => setFiltro(f)}
@@ -34,7 +33,7 @@ export function Catalogo({ productos, whatsappNumero }: { productos: Producto[];
                 : "bg-surface text-muted border-border hover:border-ink/30"
             }`}
           >
-            {f === "todos" ? "Todos" : CATEGORIA_LABEL[f]}
+            {f === "todos" ? "Todos" : categoriaLabel(f)}
           </button>
         ))}
       </div>
@@ -61,7 +60,7 @@ export function Catalogo({ productos, whatsappNumero }: { productos: Producto[];
               <div className="p-5 flex flex-col gap-3 flex-1">
                 <span className="inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-xs font-semibold bg-accent-tint text-accent-dark">
                   <IconoCategoria categoria={producto.categoria} className="w-3.5 h-3.5" />
-                  {CATEGORIA_LABEL[producto.categoria]}
+                  {categoriaLabel(producto.categoria)}
                 </span>
                 <Link href={`/productos/${producto.id}`} className="font-display font-semibold text-lg leading-snug hover:underline">
                   {producto.nombre}

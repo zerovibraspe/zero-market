@@ -12,6 +12,10 @@ const WHATSAPP_NUMERO = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "51999999999"
 export default async function Home() {
   const lista = await db.select().from(productos).where(eq(productos.activo, true));
 
+  // Tarjetas decorativas del hero: productos reales (con su foto si tienen), no íconos fijos.
+  // Cambian solas a medida que subes productos/fotos nuevas desde el CMS.
+  const destacados = [...lista].sort((a, b) => b.creadoEn.getTime() - a.creadoEn.getTime()).slice(0, 3);
+
   return (
     <div className="flex flex-col flex-1">
       <header className="sticky top-4 z-10 mx-4 sm:mx-8">
@@ -43,21 +47,34 @@ export default async function Home() {
           </div>
         </div>
         <div className="relative h-64 hidden md:block">
-          {(["pdf", "video", "plugin"] as const).map((cat, i) => (
-            <div
-              key={cat}
-              className="absolute w-40 h-52 bg-surface border border-border rounded-2xl shadow-md flex flex-col items-center justify-center gap-3"
-              style={{
-                left: `${i * 70}px`,
-                top: `${i * 20}px`,
-                transform: `rotate(${(i - 1) * 6}deg)`,
-                zIndex: i,
-              }}
-            >
-              <IconoCategoria categoria={cat} className="w-8 h-8 text-accent-dark" />
-              <span className="text-xs font-semibold uppercase text-muted">{cat}</span>
-            </div>
-          ))}
+          {destacados.length === 0
+            ? ["pdf", "video", "plugin"].map((cat, i) => (
+                <div
+                  key={cat}
+                  className="absolute w-40 h-52 bg-surface border border-border rounded-2xl shadow-md flex flex-col items-center justify-center gap-3"
+                  style={{ left: `${i * 70}px`, top: `${i * 20}px`, transform: `rotate(${(i - 1) * 6}deg)`, zIndex: i }}
+                >
+                  <IconoCategoria categoria={cat} className="w-8 h-8 text-accent-dark" />
+                  <span className="text-xs font-semibold uppercase text-muted">{cat}</span>
+                </div>
+              ))
+            : destacados.map((producto, i) => (
+                <div
+                  key={producto.id}
+                  className="absolute w-40 h-52 bg-surface border border-border rounded-2xl shadow-md overflow-hidden flex flex-col items-center justify-center gap-3"
+                  style={{ left: `${i * 70}px`, top: `${i * 20}px`, transform: `rotate(${(i - 1) * 6}deg)`, zIndex: i }}
+                >
+                  {producto.fotos[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={producto.fotos[0]} alt={producto.nombre} className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <IconoCategoria categoria={producto.categoria} className="w-8 h-8 text-accent-dark" />
+                      <span className="text-xs font-semibold uppercase text-muted px-2 text-center">{producto.categoria}</span>
+                    </>
+                  )}
+                </div>
+              ))}
         </div>
       </section>
 

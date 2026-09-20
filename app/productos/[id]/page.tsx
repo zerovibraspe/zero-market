@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { productos } from "@/db/schema";
-import { CATEGORIA_LABEL, formatearPrecio, linkWhatsapp } from "@/lib/productos";
+import { categoriaLabel, formatearPrecio, linkWhatsapp } from "@/lib/productos";
 import { IconoCategoria } from "@/app/components/IconoCategoria";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +46,7 @@ export default async function ProductoDetallePage({ params }: { params: Promise<
         <div>
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-accent-tint text-accent-dark mb-3">
             <IconoCategoria categoria={producto.categoria} className="w-3.5 h-3.5" />
-            {CATEGORIA_LABEL[producto.categoria]}
+            {categoriaLabel(producto.categoria)}
           </span>
           <h1 className="font-display font-bold text-3xl mb-2">{producto.nombre}</h1>
           {producto.autorNombre && <p className="text-sm text-muted mb-4">Por {producto.autorNombre}</p>}

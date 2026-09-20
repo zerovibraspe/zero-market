@@ -1,5 +1,8 @@
 Fotos de producto — a propósito viven aquí (repo de GitHub/Vercel) y no en Backblaze B2.
 
-Convención: una carpeta por producto, ej. `public/productos/plantillas-notion/1.jpg`, `2.jpg`.
+No se editan a mano: el CMS (`/admin/productos`) las sube automáticamente vía la API de contenidos
+de GitHub (`lib/github.ts`) cuando el vendedor selecciona archivos en el campo "Fotos" al crear un
+producto. Cada subida crea un commit en `public/productos/<slug-del-producto>/`, lo que dispara un
+redeploy automático en Vercel (~1 minuto hasta que la foto se vea en la página).
 
-Al crear/editar un producto en `/admin/productos`, pega esas rutas (`/productos/plantillas-notion/1.jpg`) en el campo "Fotos", separadas por coma. Súbelas a esta carpeta y haz commit/push antes de crear el producto para que la imagen ya exista en el deploy.
+Requiere las variables `GITHUB_TOKEN`, `GITHUB_REPO` y `GITHUB_BRANCH` — ver `.env.example`.

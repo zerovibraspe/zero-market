@@ -14,9 +14,9 @@ export const productos = pgTable("productos", {
   nombre: text("nombre").notNull(),
   descripcion: text("descripcion"),
   autorNombre: text("autor_nombre"),
-  categoria: text("categoria", {
-    enum: ["pdf", "video", "plugin", "otro"],
-  }).notNull(),
+  // Texto libre: el vendedor puede crear las categorías que quiera desde el CMS, no está
+  // limitado a un enum fijo. "pdf"/"video"/"plugin" son solo sugerencias iniciales.
+  categoria: text("categoria").notNull(),
   portadaUrl: text("portada_url"),
   // Rutas dentro de /public (ej. "/productos/mi-producto/1.jpg"), servidas desde el propio
   // repo de GitHub/Vercel — a propósito no viven en B2, ver README "Fotos de producto".

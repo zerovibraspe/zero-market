@@ -31,7 +31,6 @@ export async function POST(req: NextRequest) {
   const codigoLicencia = generarCodigoLicencia();
 
   const archivoPersonalizado = await personalizarArchivo({
-    categoria: producto.categoria,
     archivoOriginal,
     nombreComprador: nombreComprador.trim(),
     codigoLicencia,

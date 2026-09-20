@@ -2,6 +2,8 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { linkWhatsappEntrega } from "@/lib/productos";
+import type { Vencimiento } from "@/lib/tickets";
 
 type Producto = { id: string; nombre: string; requiereWatermark: boolean };
 
@@ -12,14 +14,22 @@ const ESQUINAS = [
   { valor: "br", label: "Inf. derecha" },
 ] as const;
 
+type TicketGenerado = {
+  url: string;
+  nombreComprador: string;
+  celularComprador: string;
+  nombreProducto: string;
+  vencimiento: Vencimiento;
+};
+
 export function FormularioTicket({ productos }: { productos: Producto[] }) {
   const router = useRouter();
   const [productoId, setProductoId] = useState(productos[0]?.id ?? "");
   const [esquina, setEsquina] = useState<"tl" | "tr" | "bl" | "br">("br");
-  const [vencimiento, setVencimiento] = useState<"24h" | "48h" | "primer_uso">("24h");
+  const [vencimiento, setVencimiento] = useState<Vencimiento>("24h");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
-  const [linkGenerado, setLinkGenerado] = useState<string | null>(null);
+  const [ticketGenerado, setTicketGenerado] = useState<TicketGenerado | null>(null);
   const [copiado, setCopiado] = useState(false);
 
   const producto = useMemo(() => productos.find((p) => p.id === productoId), [productos, productoId]);
@@ -28,21 +38,22 @@ export function FormularioTicket({ productos }: { productos: Producto[] }) {
     e.preventDefault();
     setError(null);
     setCargando(true);
-    setLinkGenerado(null);
+    setTicketGenerado(null);
 
     const formData = new FormData(e.currentTarget);
-    const body = {
-      productoId,
-      nombreComprador: String(formData.get("nombreComprador") ?? ""),
-      celularComprador: String(formData.get("celularComprador") ?? ""),
-      posicionMarcaAgua: producto?.requiereWatermark ? esquina : null,
-      vencimiento,
-    };
+    const nombreComprador = String(formData.get("nombreComprador") ?? "");
+    const celularComprador = String(formData.get("celularComprador") ?? "");
 
     const res = await fetch("/api/tickets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        productoId,
+        nombreComprador,
+        celularComprador,
+        posicionMarcaAgua: producto?.requiereWatermark ? esquina : null,
+        vencimiento,
+      }),
     });
 
     setCargando(false);
@@ -55,7 +66,13 @@ export function FormularioTicket({ productos }: { productos: Producto[] }) {
 
     const data = await res.json();
     const url = `${window.location.origin}${data.urlDescarga}`;
-    setLinkGenerado(url);
+    setTicketGenerado({
+      url,
+      nombreComprador,
+      celularComprador,
+      nombreProducto: producto?.nombre ?? "",
+      vencimiento,
+    });
     await navigator.clipboard.writeText(url).then(
       () => setCopiado(true),
       () => setCopiado(false),
@@ -113,7 +130,7 @@ export function FormularioTicket({ productos }: { productos: Producto[] }) {
 
       <label className="flex flex-col gap-1.5 text-sm">
         <span className="font-medium text-muted">Vencimiento del link</span>
-        <select value={vencimiento} onChange={(e) => setVencimiento(e.target.value as typeof vencimiento)} className="input">
+        <select value={vencimiento} onChange={(e) => setVencimiento(e.target.value as Vencimiento)} className="input">
           <option value="24h">24 horas</option>
           <option value="48h">48 horas</option>
           <option value="primer_uso">Al primer uso</option>
@@ -122,10 +139,20 @@ export function FormularioTicket({ productos }: { productos: Producto[] }) {
 
       {error && <p className="text-sm text-error-fg bg-error-bg rounded-lg px-3 py-2">{error}</p>}
 
-      {linkGenerado && (
-        <div className="text-sm bg-success-bg text-success-fg rounded-lg px-3 py-2 break-all">
-          {copiado ? "Link copiado: " : "Link generado: "}
-          {linkGenerado}
+      {ticketGenerado && (
+        <div className="flex flex-col gap-3 bg-success-bg text-success-fg rounded-lg px-3 py-3">
+          <p className="text-sm break-all">
+            {copiado ? "Link copiado: " : "Link generado: "}
+            {ticketGenerado.url}
+          </p>
+          <a
+            href={linkWhatsappEntrega(ticketGenerado)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="self-start px-4 py-2 rounded-full bg-ink text-white text-sm font-semibold"
+          >
+            Enviar link por WhatsApp
+          </a>
         </div>
       )}
 

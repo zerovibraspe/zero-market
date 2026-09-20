@@ -30,20 +30,21 @@ Ver [`docs/Handoff Tienda de productos digitales — Landing + CMS.md`](docs/Han
 
 - Subir archivo maestro de un producto (PDF, video o plugin), una sola vez por producto, incluyendo el nombre del autor/creador (se imprime en la marca de agua de ese producto — varía por producto, no es un valor global)
 - Generar un ticket: elegir producto + ingresar nombre y celular del comprador
-- Configurar en qué esquina va la marca de agua (solo aplica si `producto.requiere_watermark`)
+- Configurar en qué esquina va la marca de agua (solo aplica si `producto.requiere_watermark`, checkbox explícito en el form — ya no se infiere de la categoría)
 - Elegir vencimiento del link (24h / 48h / al primer uso)
 - Al generar el ticket, el sistema:
   1. Toma el archivo maestro
   2. Genera una copia personalizada (marca de agua + metadata para PDF; solo metadata para video/plugin)
   3. Sube la copia a B2
   4. Crea el registro del ticket en la base de datos con fecha de expiración (o null si es "al primer uso")
-  5. Devuelve el link de descarga (`/descargar/[codigo]`) para copiar y enviar por WhatsApp
+  5. Devuelve el link de descarga (`/descargar/[codigo]`), lo copia al portapapeles, y ofrece un botón "Enviar link por WhatsApp" que abre `wa.me/<celular_comprador>` (no el número de ventas) con el link, el aviso de vencimiento y la nota de un solo uso precargados — ver `lib/productos.ts#linkWhatsappEntrega`
 
 ### 2. Landing pública + descarga (comprador)
 
-- `/` — catálogo con thumbnail, categoría, título, precio y botón de compra por categoría (PDF/Video/Plugin); filtrado real por categoría implementado (no solo visual)
+- `/` — catálogo con thumbnail, categoría, título, precio y botón de compra; filtrado real por categoría implementado (no solo visual). Las 3 tarjetas decorativas del hero muestran los productos reales más recientes (con su foto si tienen) en vez de íconos fijos — cambian solas a medida que se suben productos/fotos.
 - Botón de compra → `wa.me/<numero>?text=<mensaje precargado con el nombre del producto>`
-- `/productos/[id]` — página de detalle del producto (no estaba en el mockup de 4 pantallas, se agregó después): galería de fotos, descripción larga, autor, precio, CTA de compra. Las fotos (`producto.fotos`) son rutas dentro de `public/productos/` — **viven en el repo de GitHub, no en B2** (decisión explícita: B2 es solo para los archivos entregables protegidos, no para imágenes de marketing). Se suben con un commit normal, luego se referencian por ruta desde el CMS.
+- **Categorías**: texto libre, no un enum fijo — el vendedor escribe la que quiera al crear un producto (con sugerencias/autocompletado de las ya usadas vía `<datalist>`). `lib/productos.ts#categoriaLabel` solo capitaliza para mostrar.
+- `/productos/[id]` — página de detalle del producto (no estaba en el mockup de 4 pantallas, se agregó después): galería de fotos, descripción larga, autor, precio, CTA de compra. Las fotos (`producto.fotos`) son rutas dentro de `public/productos/` — **viven en el repo de GitHub, no en B2** (decisión explícita: B2 es solo para los archivos entregables protegidos, no para imágenes de marketing). El CMS las sube automáticamente vía la API de contenidos de GitHub (`lib/github.ts`) cuando el vendedor selecciona archivos en el form — no requiere que el vendedor sepa usar git.
 - `/descargar/[codigo]` — página mobile-first que:
   1. Valida contra la base de datos si el ticket sigue vigente (no expirado, no usado)
   2. Si es válido: muestra portada, saludo personalizado, número de licencia con aviso de uso exclusivo, aviso de vencimiento, y botón de descarga
@@ -66,7 +67,7 @@ Esto es lo que permite controlar la expiración real (por tiempo Y por uso únic
 Ver `db/schema.ts` (Drizzle) y `db/migrations/0001_init.sql` para el detalle. Resumen:
 
 **productos**
-- `id`, `nombre`, `descripcion`, `autor_nombre` (para la marca de agua, definido por producto en el CMS), `categoria` (`pdf` \| `video` \| `plugin` \| `otro`), `portada_url` (legado, ya no se usa desde el CMS), `fotos` (jsonb, array de rutas dentro de `public/productos/` — viven en GitHub, no en B2), `archivo_maestro_url`, `precio`, `requiere_watermark` (bool), `activo` (bool, visible en catálogo)
+- `id`, `nombre`, `descripcion`, `autor_nombre` (para la marca de agua, definido por producto en el CMS), `categoria` (texto libre, no enum), `portada_url` (legado, ya no se usa desde el CMS), `fotos` (jsonb, array de rutas dentro de `public/productos/` — viven en GitHub, no en B2), `archivo_maestro_url`, `precio`, `requiere_watermark` (bool, checkbox explícito en el CMS), `activo` (bool, visible en catálogo)
 
 **tickets**
 - `id`, `producto_id` (FK), `codigo_licencia` (único), `nombre_comprador`, `celular_comprador`, `posicion_marca_agua` (`tl`\|`tr`\|`bl`\|`br`, solo si aplica), `archivo_personalizado_url`, `estado` (`pendiente`\|`descargado`\|`expirado`), `fecha_expiracion` (nullable), `fecha_creacion`, `fecha_descarga` (nullable)

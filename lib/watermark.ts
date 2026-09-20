@@ -33,19 +33,18 @@ export async function generarPdfPersonalizado(params: {
   return pdfDoc.save();
 }
 
-// Video y plugin (.zip) no se re-procesan: incrustar metadata ahí requiere herramientas
-// específicas por formato (ffmpeg, librería de zip) que exceden el alcance del MVP —
-// ver "Fuera de alcance" en CLAUDE.md. El código de licencia queda igual asociado
-// al ticket en la base de datos, que es lo que valida /descargar/[codigo].
+// Archivos que no requieren marca de agua (producto.requiereWatermark = false) no se re-procesan:
+// incrustar metadata en video/zip requiere herramientas específicas por formato (ffmpeg, librería
+// de zip) que exceden el alcance del MVP — ver "Fuera de alcance" en CLAUDE.md. El código de
+// licencia queda igual asociado al ticket en la base de datos, que es lo que valida /descargar/[codigo].
 export async function personalizarArchivo(params: {
-  categoria: "pdf" | "video" | "plugin" | "otro";
   archivoOriginal: Uint8Array;
   nombreComprador: string;
   codigoLicencia: string;
   autorNombre?: string | null;
   esquina: Esquina | null;
 }): Promise<Uint8Array> {
-  if (params.categoria === "pdf" && params.esquina) {
+  if (params.esquina) {
     return generarPdfPersonalizado({
       archivoOriginal: params.archivoOriginal,
       nombreComprador: params.nombreComprador,
