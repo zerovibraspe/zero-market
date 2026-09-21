@@ -22,12 +22,41 @@ export function ComoFunciona() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-6 items-stretch">
-      <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+      {/* Mobile: tabs segmentados + texto del paso activo (evita el carrusel cortado) */}
+      <div className="md:hidden">
+        <div className="flex gap-2 mb-4">
+          {PASOS.map((p, i) => (
+            <button
+              key={p.titulo}
+              onClick={() => setPaso(i)}
+              aria-label={p.titulo}
+              className={`flex-1 flex items-center justify-center py-2.5 rounded-full border transition-colors ${
+                paso === i ? "bg-ink border-ink" : "bg-surface border-border"
+              }`}
+            >
+              <span
+                className={`flex items-center justify-center w-5 h-5 rounded-full text-[11px] font-bold ${
+                  paso === i ? "bg-accent text-ink" : "bg-surface-alt text-muted"
+                }`}
+              >
+                {i + 1}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div>
+          <h3 className="font-display font-semibold mb-1">{PASOS[paso].titulo}</h3>
+          <p className="text-sm text-muted">{PASOS[paso].texto}</p>
+        </div>
+      </div>
+
+      {/* Desktop: lista vertical completa */}
+      <div className="hidden md:flex md:flex-col gap-3">
         {PASOS.map((p, i) => (
           <button
             key={p.titulo}
             onClick={() => setPaso(i)}
-            className={`text-left shrink-0 w-64 md:w-auto rounded-2xl border p-5 transition-colors ${
+            className={`text-left rounded-2xl border p-5 transition-colors ${
               paso === i
                 ? "bg-surface border-accent-dark shadow-sm"
                 : "bg-surface border-border hover:border-ink/20"
@@ -48,7 +77,7 @@ export function ComoFunciona() {
         ))}
       </div>
 
-      <div className="bg-surface-alt border border-border rounded-2xl p-6 sm:p-8 min-h-[280px] flex items-center justify-center">
+      <div className="bg-surface-alt border border-border rounded-2xl p-5 sm:p-8 min-h-[240px] sm:min-h-[280px] flex items-center justify-center">
         {paso === 0 && <AnimacionWhatsapp key="wa" />}
         {paso === 1 && <AnimacionPago key="pago" />}
         {paso === 2 && <AnimacionDescarga key="descarga" />}

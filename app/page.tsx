@@ -36,7 +36,7 @@ export default async function Home() {
         </nav>
       </header>
 
-      <section className="max-w-5xl mx-auto w-full px-6 sm:px-8 pt-20 pb-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="max-w-5xl mx-auto w-full px-6 sm:px-8 pt-10 pb-12 sm:pt-20 sm:pb-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <div>
           <h1 className="font-display font-bold text-4xl sm:text-5xl leading-tight mb-4">
             Recursos digitales listos para descargar
@@ -83,8 +83,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="como-funciona" className="max-w-5xl mx-auto w-full px-6 sm:px-8 py-16">
-        <h2 className="font-display font-bold text-2xl mb-8 text-center">Cómo funciona</h2>
+      <section id="como-funciona" className="max-w-5xl mx-auto w-full px-6 sm:px-8 py-12 sm:py-16">
+        <h2 className="font-display font-bold text-2xl mb-6 sm:mb-8 text-center">Cómo funciona</h2>
         <ComoFunciona />
       </section>
 
