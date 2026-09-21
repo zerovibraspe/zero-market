@@ -3,6 +3,7 @@ import { productos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { Catalogo } from "./components/Catalogo";
 import { IconoCategoria } from "./components/IconoCategoria";
+import { ComoFunciona } from "./components/ComoFunciona";
 
 export const dynamic = "force-dynamic";
 
@@ -84,18 +85,7 @@ export default async function Home() {
 
       <section id="como-funciona" className="max-w-5xl mx-auto w-full px-6 sm:px-8 py-16">
         <h2 className="font-display font-bold text-2xl mb-8 text-center">Cómo funciona</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {[
-            { titulo: "Escribe por WhatsApp", texto: "Elige el recurso y contáctanos con un clic." },
-            { titulo: "Paga por Yape o Plin", texto: "Confirmamos tu pago directo en el chat." },
-            { titulo: "Recibe tu link personal", texto: "Descarga tu recurso con tu código de licencia." },
-          ].map((paso) => (
-            <div key={paso.titulo} className="bg-surface border border-border rounded-2xl p-6">
-              <h3 className="font-display font-semibold mb-2">{paso.titulo}</h3>
-              <p className="text-sm text-muted">{paso.texto}</p>
-            </div>
-          ))}
-        </div>
+        <ComoFunciona />
       </section>
 
       <section id="catalogo" className="bg-surface-alt py-16">
